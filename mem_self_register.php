@@ -150,14 +150,14 @@ if (txpinterface === 'admin') {
 
         extract($prefs);
 
-        if ($event!='self-reg')
+        if ($event !== 'self-reg')
             return;
 
         pageTop('Self Registration','');
 
-        if ($step == 'install') {
+        if ($step === 'install') {
             echo mem_self_register_install();
-        } else if ($step=='preinstall') {
+        } elseif ($step === 'preinstall') {
             $mem_xtra_columns   = mem_get_extra_user_columns();
 
             $mem_admin_name = !empty($mem_admin_name) ? $mem_admin_name : 'Admin';
@@ -211,7 +211,9 @@ if (txpinterface === 'admin') {
             'add_phone'
         ))));
 
-        if (!isset($new_user_priv) || empty($new_user_priv)) $new_user_priv = '0';
+        if (!isset($new_user_priv) || empty($new_user_priv)) {
+            $new_user_priv = '0';
+        }
 
         $log = array();
 
@@ -225,12 +227,14 @@ if (txpinterface === 'admin') {
             if ($rs['html'] != 'yesnoradio') {
                 safe_update('txp_prefs',"html='yesnoradio'","name='mem_self_use_ign_db'");
             }
+
             $log[] = gTxt('mem_self_log_pref_exists', array('{name}'=>'mem_self_use_ign_db','{value}'=>$rs));
         }
 
         $user_table = mem_get_user_table_name();
 
         $xtra_columns = mem_get_extra_user_columns();
+
         if ($add_address) {
             if (!in_array('address',$xtra_columns)) {
                 if (safe_alter($user_table,"ADD `address` VARCHAR( 128 )")) {
@@ -242,6 +246,7 @@ if (txpinterface === 'admin') {
                 $log[] = gTxt('mem_self_log_col_exists', array('{name}'=>'address','{table}'=>$user_table));
             }
         }
+
         if ($add_phone) {
             if (!in_array('phone',$xtra_columns)) {
                 if (safe_alter($user_table,"ADD `phone` VARCHAR( 32 )")) {
@@ -263,6 +268,7 @@ if (txpinterface === 'admin') {
         } else {
             $log[] = gTxt('mem_self_log_pref_exists', array('{name}'=>'mem_self_admin_email','{value}'=>$rs));
         }
+
         if (!($rs=safe_field('val','txp_prefs',"name='mem_self_admin_name'"))) {
             if ( set_pref('mem_self_admin_name',$admin_name,'self_reg',1)) {
                 $log[] = gTxt('mem_self_log_added_pref', array('{name}'=>'mem_self_admin_name'));
@@ -272,6 +278,7 @@ if (txpinterface === 'admin') {
         } else {
             $log[] = gTxt('mem_self_log_pref_exists', array('{name}'=>'mem_self_admin_name','{value}'=>$rs));
         }
+
         if (!($rs=safe_row('val,html','txp_prefs',"name='mem_self_new_user_priv'"))) {
             if ( set_pref('mem_self_new_user_priv',$new_user_priv,'self_reg',1,0,'priv_levels')) {
                 $log[] = gTxt('mem_self_log_added_pref', array('{name}'=>'mem_self_new_user_priv'));
@@ -284,6 +291,7 @@ if (txpinterface === 'admin') {
 
             $log[] = gTxt('mem_self_log_pref_exists', array('{name}'=>'mem_self_new_user_priv','{value}' => $rs));
         }
+
         if (!($rs=safe_field('val','txp_prefs',"name='mem_self_admin_bcc'"))) {
             if ( set_pref('mem_self_admin_bcc','0','self_reg',1,'yesnoradio')) {
                 $log[] = gTxt('mem_self_log_added_pref', array('{name}'=>'mem_self_admin_bcc'));
@@ -312,6 +320,7 @@ if (txpinterface === 'admin') {
 EOF;
 
         $form = fetch('Form','txp_form','name','self_register_form');
+
         if (!$form) {
             if (safe_insert('txp_form',"name='self_register_form',type='misc',Form='{$form_html}'")) {
                 $log[] = gTxt('mem_self_log_form_added', array('{name}'=>'self_register_form'));
@@ -330,6 +339,7 @@ EOF;
 EOF;
 
         $form = fetch('Form','txp_form','name','self_register_success');
+
         if (!$form) {
             if (safe_insert('txp_form',"name='self_register_success',type='misc',Form='{$form_html}'")) {
                 $log[] = gTxt('mem_self_log_form_added', array('{name}'=>'self_register_success'));
@@ -358,6 +368,7 @@ Sincerely,
 EOF;
 
         $form = fetch('Form','txp_form','name','self_register_email');
+
         if (!$form) {
             if (safe_insert('txp_form',"name='self_register_email',type='misc',Form='{$form_html}'")) {
                 $log[] = gTxt('mem_self_log_form_added', array('{name}'=>'self_register_email'));
@@ -380,25 +391,25 @@ EOF;
 
 register_callback('mem_self_register_form_submit','mem_form.submit');
 
-function mem_self_register_form($atts,$thing='')
+function mem_self_register_form($atts, $thing = '')
 {
     global $prefs, $sitename, $production_status;
 
     extract(lAtts(array(
-        'form'      => '',
-        'email_form'    => '',
-        'from'      => $prefs['mem_self_admin_email'],
-        'reply'     => '',
-        'subject'   => '['.$sitename.'] '. gTxt('mem_self_your_login_info'),
-        'login_url' => rtrim(hu,'/').'/textpattern/index.php',
-    ),$atts,false));
+        'form'       => '',
+        'email_form' => '',
+        'from'       => $prefs['mem_self_admin_email'],
+        'reply'      => '',
+        'subject'    => '['.$sitename.'] '. gTxt('mem_self_your_login_info'),
+        'login_url'  => rtrim(hu,'/').'/textpattern/index.php',
+    ), $atts, false));
 
     if (!empty($form)) {
         $thing = fetch_form($form);
         unset($atts['form']);
     }
 
-    foreach(array('from','reply','subject','login_url','email_form') as $a) {
+    foreach (array('from','reply','subject','login_url','email_form') as $a) {
         $thing .= '<txp:mem_form_secret name="'.$a.'" value="'.$$a.'" />';
         unset($atts[$a]);
     }
@@ -411,44 +422,40 @@ function mem_self_register_form_submit()
 {
     global $prefs, $mem_self, $sitename, $mem_profile, $mem_form_type, $mem_form_values, $mem_form_thanks_form;
 
-    if ($mem_form_type != 'mem_self_register') return;
+    if ($mem_form_type != 'mem_self_register') {
+        return;
+    }
 
     extract($mem_self);
 
-    if (isset($mem_form_values['password']))
-    {
-        if (isset($mem_form_values['password2']) && $mem_form_values['password'] != $mem_form_values['password2'])
-        {
+    if (isset($mem_form_values['password'])) {
+        if (isset($mem_form_values['password2']) && $mem_form_values['password'] != $mem_form_values['password2']) {
             return mem_form_error(gTxt('passwords_do_not_match'));
         }
 
         $pw = $mem_form_values['password'];
-    }
-    else
-    {
+    } else {
         $pw = generate_password(16);
     }
 
     $hash = Txp::get('\Textpattern\Password\Hash')->hash($pw);
 
-    if (!$mem_profile) $mem_profile = array();
+    if (!$mem_profile) {
+        $mem_profile = array();
+    }
 
-    if (array_key_exists('first_name', $mem_form_values))
-    {
+    if (array_key_exists('first_name', $mem_form_values)) {
         $mem_profile['first_name'] = $first_name = $mem_form_values['first_name'];
         $mem_profile['last_name'] = $last_name = $mem_form_values['last_name'];
         $mem_profile['RealName'] = $name = $first_name . ' ' . $last_name;
-    }
-    else
-    {
+    } else {
         $mem_profile['RealName'] = $name = $mem_form_values['RealName'];
         $name_parts = explode(' ', $name, 2);
         $mem_profile['first_name'] = @$name_parts[0];
         $mem_profile['last_name'] = @$name_parts[1];
     }
 
-    $mem_profile['nonce'] = $nonce = md5( uniqid( rand(), true ) );
-
+    $mem_profile['nonce'] = $nonce = md5(uniqid(rand(), true));
     $mem_profile['email'] = $email = $mem_form_values['email'];
     $mem_profile['name'] = $username = $mem_form_values['name'];
     $mem_profile['privs'] = $new_user_priv;
@@ -459,7 +466,7 @@ function mem_self_register_form_submit()
 
     $xtra_columns = mem_get_extra_user_columns();
 
-    foreach($xtra_columns as $c) {
+    foreach ($xtra_columns as $c) {
         $c_name = trim( $c['Field'] );
 
         if (isset($mem_form_values[$c_name]))
@@ -511,7 +518,7 @@ EOF;
             $vals['username']       = $vals['name'];
             $vals['RealName'] = empty($vals['RealName']) ? $mem_profile['RealName'] : $vals['RealName'];
 
-            foreach ($vals as $a=>$b) {
+            foreach ($vals as $a => $b) {
                 $message = str_ireplace('<txp:mem_'.$a.' />', $b, $message);
                 $message = str_ireplace('{'.$a.'}', $b, $message);
                 $mem_form_thanks_form = str_ireplace('<txp:mem_'.$a.' />', $b, $mem_form_thanks_form);
@@ -555,7 +562,8 @@ EOF;
 
 
 /** Returns the name of the user table (without PFXS) */
-function mem_get_user_table_name() {
+function mem_get_user_table_name()
+{
     global $prefs;
 
     extract($prefs);
@@ -563,20 +571,20 @@ function mem_get_user_table_name() {
     $table_name = 'txp_users';
 
     if (isset($mem_self_use_ign_db) && $mem_self_use_ign_db == '1') {
-
-        if (isset($ign_use_custom) && $ign_use_custom=='1') {
-
+        if (isset($ign_use_custom) && $ign_use_custom == '1') {
             if (isset($ign_user_db) && !empty($ign_user_db))
                 $table_name = $ign_user_db;
         }
     }
 
     $new_name = callback_event('mem_self_register.get_user_table', '', 0, $table_name);
+
     return empty($new_name) ? $table_name : $new_name;
 }
 
 /** SQL string builder for non-standard fields */
-function mem_get_extra_user_columns_insert_string() {
+function mem_get_extra_user_columns_insert_string()
+{
     $xtra_columns = mem_get_extra_user_columns();
 
     $xtra = '';
@@ -586,14 +594,15 @@ function mem_get_extra_user_columns_insert_string() {
         $type = strtolower($xcol['Type']);
         $val = gps($name);
 
-        if ( strstr($type,'int')
+        if (strstr($type,'int')
                 || $type=='float'
                 || $type=='decimal'
                 || $type=='double'
                 || $type=='bool' ) {
             // don't quote value
-            if (!intval($val))
-                $val = ( $val=='yes' || $val=='on' ) ? $val = 1 : $val = 0;
+            if (!intval($val)) {
+                $val = ( $val == 'yes' || $val == 'on' ) ? $val = 1 : $val = 0;
+            }
 
             $xtra .= ", {$name}=" . ($val == false ? '0' : doSlash($val));
         } else {
@@ -621,9 +630,10 @@ function mem_get_extra_user_columns()
 
     $dcols = $default_columns;
 
-    foreach($txpdesc as $r) {
-        if ( !in_array($r['Field'], $default_columns) )
+    foreach ($txpdesc as $r) {
+        if (!in_array($r['Field'], $default_columns)) {
             $xtra_cols[] = $r;
+        }
     }
 
     return $xtra_cols;
@@ -633,6 +643,7 @@ function mem_get_extra_user_columns()
 function mem_self_register_email_message($atts)
 {
     global $mem_self;
+
     return $mem_self['email_message'];
 }
 
@@ -640,23 +651,28 @@ function mem_self_register_email_message($atts)
 function mem_self_register_status_message($atts)
 {
     global $mem_self;
+
     return $mem_self['status_message'];
 }
 
 
 // -------------------------------------------------------------
-function mem_if_message_sent($atts,$thing)
+function mem_if_message_sent($atts, $thing)
 {
     global $mem_self;
+
     $condition = ($mem_self['email_status']);
+
     return parse(EvalElse($thing, $condition));
 }
 
 // -------------------------------------------------------------
-function mem_if_self_registered($atts,$thing)
+function mem_if_self_registered($atts, $thing)
 {
     global $mem_self,$txp_user,$ign_user;
+
     $condition = ($mem_self['status'] or !empty($_COOKIE['txp_self_registered']) or !empty($txp_user) or !empty($ign_user) );
+
     return parse(EvalElse($thing, $condition));
 }
 
@@ -665,29 +681,28 @@ function mem_if_self_registered($atts,$thing)
 ////////////////////////////////////////////////////////////////////
 // User Side Profile and Password Change Forms
 // -------------------------------------------------------------
-if (txpinterface != 'admin' and !function_exists('txp_validate')) {
+if (txpinterface !== 'admin' and !function_exists('txp_validate')) {
     require_once txpath.'/include/txp_auth.php';
 }
 
-function mem_self_password_reset_form($atts,$thing='')
+function mem_self_password_reset_form($atts, $thing = '')
 {
     global $prefs, $mem_self, $sitename, $production_status;
 
     extract(lAtts(array(
-        'form'      => '',
-        'form_mail' => false,
-        'from'      => $mem_self['admin_email'],
-        'reply'     => '',
-        'subject'   => "[$sitename] ".gTxt('mem_self_password_reset_confirmation_request'),
+        'form'          => '',
+        'form_mail'     => false,
+        'from'          => $mem_self['admin_email'],
+        'reply'         => '',
+        'subject'       => "[$sitename] ".gTxt('mem_self_password_reset_confirmation_request'),
         'confirm_url'   => '',
         'new_subject'   => "[$sitename] ".gTxt('your_new_password'),
         'new_form_mail' => false,
         'check_name'    => 1,
         'check_email'   => 1
-    ),$atts,false));
+    ), $atts, false));
 
-    if (gps('mem_self_confirm'))
-    {
+    if (gps('mem_self_confirm')) {
         $user_table = mem_get_user_table_name();
 
         sleep(3);
@@ -696,37 +711,31 @@ function mem_self_password_reset_form($atts,$thing='')
         $name    = substr($confirm, 5);
         $user = safe_row('*', $user_table, "name = '".doSlash($name)."'");
 
-        if ($user['nonce'] and $confirm === pack('H*', substr(md5($user['nonce']), 0, 10)).$name)
-        {
+        if ($user['nonce'] and $confirm === pack('H*', substr(md5($user['nonce']), 0, 10)).$name) {
             $email = $user['email'];
             $new_pass = generate_password(16);
             $hash = Txp::get('\Textpattern\Password\Hash')->hash($new_pass);
 
             $rs = safe_update($user_table, "pass = '{$hash}'", "name = '" . doSlash($name) . "'");
 
-            if ($rs)
-            {
-                if (!empty($new_form_mail))
-                {
+            if ($rs) {
+                if (!empty($new_form_mail)) {
                     $message = parse_form($new_form_mail);
 
                     $vals = $user;
-                    $vals['password'] = $new_pass;
-                    $vals['sitename']   = $sitename;
-                    $vals['admin_name'] = $prefs['mem_self_admin_name'];
-                    $vals['admin_email']    = $mem_self['admin_email'];
-                    $vals['siteurl']        = hu;
-                    $vals['username']       = empty($vals['username']) ? $name : $vals['username'];
-                    $vals['RealName']       = $RealName;
+                    $vals['password']    = $new_pass;
+                    $vals['sitename']    = $sitename;
+                    $vals['admin_name']  = $prefs['mem_self_admin_name'];
+                    $vals['admin_email'] = $mem_self['admin_email'];
+                    $vals['siteurl']     = hu;
+                    $vals['username']    = empty($vals['username']) ? $name : $vals['username'];
+                    $vals['RealName']    = $RealName;
 
-                    foreach ($vals as $a=>$b) {
+                    foreach ($vals as $a => $b) {
                         $message = str_ireplace('{'.$a.'}', $b, $message);
                         $message = str_ireplace('<txp:mem_'.$a.' />',$b,$message);
                     }
-
-                }
-                else
-                {
+                } else {
                     $login_url = hu . 'textpattern/index.php';
 
                     $message =<<<EOHTML
@@ -735,21 +744,22 @@ Greetings {$name},
 Your password is: {$new_pass}
 You can sign in to your account at {$login_url}.
 EOHTML;
-
                 }
 
-                if (mem_form_mail($from, $reply, $email, $new_subject, $message))
+                if (mem_form_mail($from, $reply, $email, $new_subject, $message)) {
                     return gTxt('mem_self_password_sent_to', array('{email}'=>$email));
-                else
+                } else {
                     return gTxt('mem_self_mail_sorry');
-            }
-            else
+                }
+            } else {
                 return gTxt('mem_self_password_change_failed');
+            }
         }
     }
 
-    if (!$check_name and !$check_email)
+    if (!$check_name and !$check_email) {
         return gTxt('mem_self_invalid_form_tags',array('{form}'=>'mem_self_password_reset_form'));
+    }
 
     if (!empty($form)) {
         $thing = fetch_form($form);
@@ -758,7 +768,7 @@ EOHTML;
 
     $secrets = array('form_mail','from','reply','subject','confirm_url', 'check_name', 'check_email');
 
-    foreach($secrets as $a) {
+    foreach ($secrets as $a) {
         $thing .= '<txp:mem_form_secret name="'.$a.'" value="'.$$a.'" />';
         unset($atts[$a]);
     }
@@ -772,8 +782,9 @@ function mem_self_password_reset_form_submit()
 {
     global $mem_form_type, $mem_form_values, $mem_profile, $prefs, $sitename;
 
-    if ($mem_form_type != 'mem_self_password_reset')
+    if ($mem_form_type != 'mem_self_password_reset') {
         return;
+    }
 
     $check_name = $mem_form_values['check_name'];
     $check_email = $mem_form_values['check_email'];
@@ -781,16 +792,16 @@ function mem_self_password_reset_form_submit()
     $where = array();
 
     if ($check_name) {
-        foreach(array('name','p_userid','username') as $n)
-        {
+        foreach(array('name','p_userid','username') as $n) {
             if (isset($mem_form_values[$n])) {
                 $name = $mem_form_values[$n];
                 break;
             }
         }
 
-        if (!isset($name))
+        if (!isset($name)) {
             return gTxt('mem_self_missing_form_field',array('{name}'=>'name'));
+        }
 
         $where[] = "name = '".doSlash($name)."'";
     }
@@ -798,19 +809,20 @@ function mem_self_password_reset_form_submit()
     if ($check_email) {
         $email = @$mem_form_values['email'];
 
-        if (empty($email))
+        if (empty($email)) {
             return gTxt('mem_self_missing_form_field',array('{name}'=>'email'));
+        }
 
         $where[] = "email = '".doSlash($email)."'";
     }
 
-    if (empty($where))
+    if (empty($where)) {
         return gTxt('mem_self_missing_form_field',array('{name}'=>'name'));
+    }
 
     $rs = safe_row('name, email, nonce, RealName', mem_get_user_table_name(), join(' and ',$where));
 
-    if ($rs)
-    {
+    if ($rs) {
         $url = @$mem_form_values['confirm_url'];
         $url = empty($url) ? hu.'textpattern/index.php' : hu.ltrim($url,'/');
         $url .= (strstr($url, '?')===false) ? '?' : '&';
@@ -825,8 +837,7 @@ function mem_self_password_reset_form_submit()
             $msg = gTxt('mem_self_greeting').' '.$name.','.
                     n.n.gTxt('mem_self_password_reset_confirmation').': '.
                     n. $url . 'mem_self_confirm='.$confirm;
-        }
-        else {
+        } else {
             $vals = $mem_form_values;
             $vals['sitename']   = $sitename;
             $vals['admin_name'] = $prefs['mem_self_admin_name'];
@@ -850,17 +861,18 @@ function mem_self_password_reset_form_submit()
         $reply = $mem_form_values['reply'];
         $subject = $mem_form_values['subject'];
 
-        if (mem_form_mail($from,$reply,$to,$subject,$msg))
+        if (mem_form_mail($from,$reply,$to,$subject,$msg)) {
             return '<ul class="memError"><li>'.gTxt('mem_self_password_reset_confirmation_request_sent').'</li></ul>';
-        else
+        } else {
             return '<ul class="memError"><li>'.gTxt('mem_self_mail_sorry').'</li></ul>';
+        }
+    } else {
+        return '<ul class="memError"><li>'.gTxt('mem_self_user_not_found').'</li></ul>';
     }
-    else
-            return '<ul class="memError"><li>'.gTxt('mem_self_user_not_found').'</li></ul>';
 }
 
 
-function mem_self_change_password_form($atts,$thing='')
+function mem_self_change_password_form($atts, $thing = '')
 {
     global $mem_self, $sitename, $production_status;
 
@@ -868,19 +880,19 @@ function mem_self_change_password_form($atts,$thing='')
     header('Pragma: no-cache');
 
     extract(lAtts(array(
-        'form'      => '',
-        'email_form'    => '',
-        'from'      => $mem_self['admin_email'],
-        'reply'     => '',
-        'subject'   => '['.$sitename.'] '. gTxt('mem_self_password_changed'),
-    ),$atts,false));
+        'form'       => '',
+        'email_form' => '',
+        'from'       => $mem_self['admin_email'],
+        'reply'      => '',
+        'subject'    => '['.$sitename.'] '. gTxt('mem_self_password_changed'),
+    ), $atts, false));
 
     if (!empty($form)) {
         $thing = fetch_form($form);
         unset($atts['form']);
     }
 
-    foreach(array('from','reply','subject','email_form') as $a) {
+    foreach (array('from','reply','subject','email_form') as $a) {
         $thing .= '<txp:mem_form_secret name="'.$a.'" value="'.$$a.'" />';
         unset($atts[$a]);
     }
@@ -894,8 +906,9 @@ function mem_self_password_form_submit()
 {
     global $prefs, $txp_user, $ign_user, $mem_form_type, $mem_form_values, $mem_form_thanks_form, $mem_self;
 
-    if ($mem_form_type != 'mem_self_password')
+    if ($mem_form_type != 'mem_self_password') {
         return;
+    }
 
     $verify_old = array_key_exists('old_password', $mem_form_values);
     $confirm = array_key_exists('password_confirm', $mem_form_values);
@@ -903,13 +916,10 @@ function mem_self_password_form_submit()
     $new_pass = $mem_form_values['password'];
     $old_pass = $mem_form_values['old_password'];
 
-    if (isset($ign_user))
-    {
+    if (isset($ign_user)) {
         $user = $ign_user;
         $is_valid = $verify_old ? ign_validate($user, $old_pass) : true;
-    }
-    else
-    {
+    } else {
         $user = $txp_user;
         $is_valid = $verify_old ? txp_validate($user, $old_pass) : true;
     }
@@ -935,30 +945,26 @@ function mem_self_password_form_submit()
     // successful
     $mem_profile = safe_row('*',mem_get_user_table_name(),"name = '{$user}'");
 
-    if ($mem_profile)
-    {
+    if ($mem_profile) {
         $mem_profile['new_pass'] = $new_pass;
 
         $message = @fetch_form($mem_form_values['email_form']);
 
-        if (!empty($message))
-        {
+        if (!empty($message)) {
             $vals = array_merge($mem_form_values, $mem_profile);
-            $vals['password']   = $new_pass;
-            $vals['sitename']   = $sitename;
-            $vals['admin_name'] = $prefs['mem_self_admin_name'];
-            $vals['admin_email']    = $vals['from'];
-            $vals['siteurl']        = hu;
-            $vals['username']       = empty($vals['username']) ? $vals['name'] : $vals['username'];
-            $vals['RealName']       = empty($vals['RealName']) ? $mem_profile['RealName'] : $vals['RealName'];
+            $vals['password']    = $new_pass;
+            $vals['sitename']    = $sitename;
+            $vals['admin_name']  = $prefs['mem_self_admin_name'];
+            $vals['admin_email'] = $vals['from'];
+            $vals['siteurl']     = hu;
+            $vals['username']    = empty($vals['username']) ? $vals['name'] : $vals['username'];
+            $vals['RealName']    = empty($vals['RealName']) ? $mem_profile['RealName'] : $vals['RealName'];
 
-            foreach ($vals as $a=>$b) {
+            foreach ($vals as $a => $b) {
                 $message = str_ireplace('{'.$a.'}', $b, $message);
                 $message = str_ireplace('<txp:mem_'.$a.' />',$b,$message);
             }
-
-        }
-        else {
+        } else {
             $message = gTxt('mem_self_greeting', array('{name}'=>$mem_form_values['RealName']))."\r\n".
                 gTxt('mem_self_your_password_is', array('{password}'=>$new_pass))."\r\n".
                 gTxt('mem_self_log_in_at', array('{url}'=> $mem_form_values['login_url']));
@@ -971,21 +977,20 @@ function mem_self_password_form_submit()
         $reply = $mem_form_values['reply'];
         $subject = $mem_form_values['subject'];
 
-        if (mem_form_mail($from,$reply,$to,$subject,$msg))
+        if (mem_form_mail($from,$reply,$to,$subject,$msg)) {
             return '<div class="mem-message mem-changed">'.gTxt('mem_self_password_changed').'</div>';
-        else
+        } else {
             return  '<div class="mem-message mem-failed">'.gTxt('mem_self_password_changed_mail_failed').'</div>';
-    }
-    else {
+        }
+    } else {
         // no email, fail silently
     }
-
 }
 
 register_callback('mem_self_user_edit_submit','mem_form.submit');
 register_callback('mem_self_register_defaults','mem_form.defaults');
 
-function mem_self_user_edit_form($atts,$thing='')
+function mem_self_user_edit_form($atts, $thing = '')
 {
     header('Cache-Control: no-cache');
     header('Pragma: no-cache');
@@ -997,10 +1002,11 @@ function mem_self_register_defaults()
 {
     global $txp_user, $ign_user, $mem_form_type, $mem_profile;
 
-    if ($mem_form_type != 'mem_self_user_edit') return;
+    if ($mem_form_type != 'mem_self_user_edit') {
+        return;
+    }
 
     $user = isset($ign_user) ? $ign_user : $txp_user;
-
 
     $mem_profile = safe_row('*',mem_get_user_table_name(),"name = '{$user}'");
 
@@ -1013,10 +1019,13 @@ function mem_self_user_edit_submit()
 {
     global $prefs, $txp_user, $ign_user, $mem_form_type, $mem_form_values, $mem_form_thanks_form, $mem_profile;
 
-    if ($mem_form_type != 'mem_self_user_edit')
+    if ($mem_form_type != 'mem_self_user_edit') {
         return;
+    }
 
-    if (isset($ign_user)) $txp_user = $ign_user;
+    if (isset($ign_user)) {
+        $txp_user = $ign_user;
+    }
 
     callback_event('mem_self_register.edit_profile', 'submit', 0, $mem_profile);
 
@@ -1028,65 +1037,73 @@ function mem_self_user_edit_submit()
 
     $sql = '';
 
-    if (!empty($mem_form_values['email']))
+    if (!empty($mem_form_values['email'])) {
         $sql  = "email = '".doSlash($mem_form_values['email'])."'";
-    if (!empty($mem_form_values['RealName']))
-        $sql .= ", RealName = '".doSlash($mem_form_values['RealName'])."'";
+    }
 
-    if (!empty($name))
-    {
+    if (!empty($mem_form_values['RealName'])) {
+        $sql .= ", RealName = '".doSlash($mem_form_values['RealName'])."'";
+    }
+
+    if (!empty($name)) {
         $sql .= ", name = '".doSlash($name)."'";
 
         // need to remove the ign_password_protect cookie
         setcookie('ign_login', '', time()-86400);
     }
 
-    if (empty($sql))
+    if (empty($sql)) {
         return gTxt('mem_self_saved_user_profile_failed');
+    }
 
     $rs = safe_update( mem_get_user_table_name(),
-                $sql . $xtra,
-                "name = '{$txp_user}'");
+            $sql . $xtra,
+            "name = '{$txp_user}'");
 
     if ($rs) {
         callback_event('mem_self_register.edit_profile', 'submit', 0, $mem_profile);
+
         return gTxt('mem_self_saved_user_profile');
-    }
-    else {
+    } else {
         return gTxt('mem_self_saved_user_profile_failed');
     }
 }
 
 
-function mem_profile($atts, $body='')
+function mem_profile($atts, $body = '')
 {
     global $mem_profile,$txp_user,$ign_user;
 
-    if (isset($ign_user)) $txp_user = $ign_user;
+    if (isset($ign_user)) {
+        $txp_user = $ign_user;
+    }
 
     extract(lAtts(array(
-        'user'      => '',
-        'userid'    => '',
-        'var'           => 'RealName',
-        'form'      => ''
-    ),$atts));
+        'user'   => '',
+        'userid' => '',
+        'var'    => 'RealName',
+        'form'   => ''
+    ), $atts));
 
     if (empty($user) && empty($userid)) {
         // use the old method
-        if (!is_array($mem_profile) && $txp_user)
+        if (!is_array($mem_profile) && $txp_user) {
             $mem_profile = safe_row('*',mem_get_user_table_name(),"name = '". doSlash($txp_user)."'");
+        }
     } else {
         $mem_profile = (is_array($mem_profile) ? $mem_profile : array());
 
         // look up a potentially new user
         if (!empty($user)) {
-            if (!array_key_exists('name', $mem_profile) || strcmp($mem_profile['name'],$user)!=0)
+            if (!array_key_exists('name', $mem_profile) || strcmp($mem_profile['name'],$user)!=0) {
                 $mem_profile = safe_row('*',mem_get_user_table_name(),"name = '". doSlash($user)."'");
+            }
         }
 
         if (!empty($userid) && is_numeric($userid)) {
-            if (!array_key_exists('user_id', $mem_profile) || strcmp($mem_profile['user_id'],$userid)!=0)
+            if (!array_key_exists('user_id', $mem_profile) || strcmp($mem_profile['user_id'],$userid)!=0) {
                 $mem_profile = safe_row('*',mem_get_user_table_name(),"user_id = ". doSlash($userid));
+            }
         }
     }
 
@@ -1107,38 +1124,55 @@ function mem_profile($atts, $body='')
 
 function mem_submit($atts) {
     extract($atts);
+
     if (isset($value)) {
         $atts['label'] = $value;
         unset($atts['value']);
     }
+
     $atts['name'] = 'save';
+
     return mem_form_submit($atts);
 }
+
 function mem_password_input($atts) {
     global $mem_profile;
+
     $atts['password'] = 1;
+
     return mem_form_text( mem_self_map_tag($atts,'new_pass','') );
 }
+
 function mem_realname_input($atts) {
     global $mem_profile;
+
     return mem_form_text( mem_self_map_tag($atts,'RealName',$mem_profile['RealName']) );
 }
+
 function mem_email_input($atts) {
     global $mem_profile;
+
     return mem_form_email( mem_self_map_tag($atts,'email',$mem_profile['email']) );
 }
+
 function mem_phone_input($atts) {
     global $mem_profile;
+
     return mem_form_text( mem_self_map_tag($atts,'phone',$mem_profile['phone']) );
 }
+
 function mem_address_input($atts) {
     global $mem_profile;
+
     return mem_form_textarea( mem_self_map_tag($atts,'address', $mem_profile['address']) );
 }
-function mem_self_map_tag($atts,$name,$default) {
+
+function mem_self_map_tag($atts, $name, $default) {
     $atts['name'] = $name;
+
     if (!empty($default))
         $atts['default'] = $default;
+
     return $atts;
 }
 
@@ -1147,15 +1181,16 @@ function mem_self_user_count($atts)
     global $mem_self;
 
     extract(lAtts(array(
-        'user_levels'   => '0,1,2,3,4,5,6',
-        'wraptag'   => '',
-        'class'     => ''
-    ),$atts));
+        'user_levels' => '0,1,2,3,4,5,6',
+        'wraptag'     => '',
+        'class'       => ''
+    ), $atts));
 
-    if (!empty($user_levels) || $user_levels=='0')
+    if (!empty($user_levels) || $user_levels=='0') {
         $user_levels = doSlash(explode(',',$user_levels));
-    else
+    } else {
         $user_levels = array($mem_self['new_user_priv']);
+    }
 
     $levels = join(',',$user_levels);
     $count = safe_field('COUNT(*)', mem_get_user_table_name(), "privs IN ({$levels})");
