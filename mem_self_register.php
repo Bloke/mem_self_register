@@ -200,7 +200,7 @@ if (txpinterface === 'admin') {
 
     function mem_self_register_install()
     {
-        global $mem_self;
+        global $mem_self, $DB;
 
         extract(doSlash(gpsa(array(
             'admin_email',
@@ -219,16 +219,16 @@ if (txpinterface === 'admin') {
 
         if (!($rs=safe_field('val,html','txp_prefs',"name='mem_self_use_ign_db'"))) {
             if ( set_pref('mem_self_use_ign_db',$use_ign_db,'self_reg',1,0,'yesnoradio')) {
-                $log[] = gTxt('mem_self_log_added_pref', array('{name}'=>'mem_self_use_ign_db'));
+                $log[] = gTxt('mem_self_log_added_pref', array('{name}' => 'mem_self_use_ign_db'));
             } else {
-                $log[] = gTxt('mem_self_log_pref_failed', array('{name}'=>'mem_self_use_ign_db','{error}'=>mysql_error()));
+                $log[] = gTxt('mem_self_log_pref_failed', array('{name}' => 'mem_self_use_ign_db','{error}' => mysqli_error($DB->link)));
             }
         } else {
             if ($rs['html'] != 'yesnoradio') {
                 safe_update('txp_prefs',"html='yesnoradio'","name='mem_self_use_ign_db'");
             }
 
-            $log[] = gTxt('mem_self_log_pref_exists', array('{name}'=>'mem_self_use_ign_db','{value}'=>$rs));
+            $log[] = gTxt('mem_self_log_pref_exists', array('{name}' => 'mem_self_use_ign_db','{value}' => $rs));
         }
 
         $user_table = mem_get_user_table_name();
@@ -238,9 +238,9 @@ if (txpinterface === 'admin') {
         if ($add_address) {
             if (!in_array('address',$xtra_columns)) {
                 if (safe_alter($user_table,"ADD `address` VARCHAR( 128 )")) {
-                    $log[] = gTxt('mem_self_log_col_added', array('{name}'=>'address','{table}'=>$user_table));
+                    $log[] = gTxt('mem_self_log_col_added', array('{name}' => 'address','{table}' => $user_table));
                 } else {
-                    $log[] = gTxt('mem_self_log_col_failed', array('{name}'=>'address','{table}'=>$user_table,'{error}'=>mysql_error()));
+                    $log[] = gTxt('mem_self_log_col_failed', array('{name}' => 'address','{table}' => $user_table,'{error}' => mysqli_error($DB->link)));
                 }
             } else {
                 $log[] = gTxt('mem_self_log_col_exists', array('{name}'=>'address','{table}'=>$user_table));
@@ -250,56 +250,56 @@ if (txpinterface === 'admin') {
         if ($add_phone) {
             if (!in_array('phone',$xtra_columns)) {
                 if (safe_alter($user_table,"ADD `phone` VARCHAR( 32 )")) {
-                    $log[] = gTxt('mem_self_log_col_added', array('{name}'=>'phone','{table}'=>$user_table));
+                    $log[] = gTxt('mem_self_log_col_added', array('{name}' => 'phone','{table}' => $user_table));
                 } else {
-                    $log[] = gTxt('mem_self_log_col_failed', array('{name}'=>'phone','{table}'=>$user_table,'{error}'=>mysql_error()));
+                    $log[] = gTxt('mem_self_log_col_failed', array('{name}' => 'phone','{table}' => $user_table,'{error}' => mysqli_error($DB->link)));
                 }
             } else {
-                $log[] = gTxt('mem_self_log_col_exists', array('{name}'=>'phone','{table}'=>$user_table));
+                $log[] = gTxt('mem_self_log_col_exists', array('{name}' => 'phone','{table}' => $user_table));
             }
         }
 
         if (!($rs=safe_field('val','txp_prefs',"name='mem_self_admin_email'"))) {
             if ( set_pref('mem_self_admin_email',$admin_email,'self_reg',1)) {
-                $log[] = gTxt('mem_self_log_added_pref', array('{name}'=>'mem_self_admin_email'));
+                $log[] = gTxt('mem_self_log_added_pref', array('{name}' => 'mem_self_admin_email'));
             } else {
-                $log[] = gTxt('mem_self_log_pref_failed', array('{name}'=>'mem_self_admin_email','{error}'=>mysql_error()));
+                $log[] = gTxt('mem_self_log_pref_failed', array('{name}' => 'mem_self_admin_email','{error}' => mysqli_error($DB->link)));
             }
         } else {
-            $log[] = gTxt('mem_self_log_pref_exists', array('{name}'=>'mem_self_admin_email','{value}'=>$rs));
+            $log[] = gTxt('mem_self_log_pref_exists', array('{name}' => 'mem_self_admin_email','{value}' => $rs));
         }
 
         if (!($rs=safe_field('val','txp_prefs',"name='mem_self_admin_name'"))) {
             if ( set_pref('mem_self_admin_name',$admin_name,'self_reg',1)) {
-                $log[] = gTxt('mem_self_log_added_pref', array('{name}'=>'mem_self_admin_name'));
+                $log[] = gTxt('mem_self_log_added_pref', array('{name}' => 'mem_self_admin_name'));
             } else {
-                $log[] = gTxt('mem_self_log_pref_failed', array('{name}'=>'mem_self_admin_name','{error}'=>mysql_error()));
+                $log[] = gTxt('mem_self_log_pref_failed', array('{name}' => 'mem_self_admin_name','{error}' => mysqli_error($DB->link)));
             }
         } else {
-            $log[] = gTxt('mem_self_log_pref_exists', array('{name}'=>'mem_self_admin_name','{value}'=>$rs));
+            $log[] = gTxt('mem_self_log_pref_exists', array('{name}' => 'mem_self_admin_name','{value}' => $rs));
         }
 
         if (!($rs=safe_row('val,html','txp_prefs',"name='mem_self_new_user_priv'"))) {
             if ( set_pref('mem_self_new_user_priv',$new_user_priv,'self_reg',1,0,'priv_levels')) {
-                $log[] = gTxt('mem_self_log_added_pref', array('{name}'=>'mem_self_new_user_priv'));
+                $log[] = gTxt('mem_self_log_added_pref', array('{name}' => 'mem_self_new_user_priv'));
                 $mem_self['new_user_priv'] = $new_user_priv;
             } else {
-                $log[] = gTxt('mem_self_log_pref_failed', array('{name}'=>'mem_self_newuser_priv','{error}'=>mysql_error()));
+                $log[] = gTxt('mem_self_log_pref_failed', array('{name}' => 'mem_self_newuser_priv','{error}' => mysqli_error($DB->link)));
             }
         } else {
             safe_update('txp_prefs',"html='priv_levels'","name='mem_self_new_user_priv'");
 
-            $log[] = gTxt('mem_self_log_pref_exists', array('{name}'=>'mem_self_new_user_priv','{value}' => $rs));
+            $log[] = gTxt('mem_self_log_pref_exists', array('{name}' => 'mem_self_new_user_priv','{value}' => $rs));
         }
 
         if (!($rs=safe_field('val','txp_prefs',"name='mem_self_admin_bcc'"))) {
             if ( set_pref('mem_self_admin_bcc','0','self_reg',1,'yesnoradio')) {
-                $log[] = gTxt('mem_self_log_added_pref', array('{name}'=>'mem_self_admin_bcc'));
+                $log[] = gTxt('mem_self_log_added_pref', array('{name}' => 'mem_self_admin_bcc'));
             } else {
-                $log[] = gTxt('mem_self_log_pref_failed', array('{name}'=>'mem_self_admin_bcc','{error}'=>mysql_error()));
+                $log[] = gTxt('mem_self_log_pref_failed', array('{name}' => 'mem_self_admin_bcc','{error}' => mysqli_error($DB->link)));
             }
         } else {
-            $log[] = gTxt('mem_self_log_pref_exists', array('{name}'=>'mem_self_admin_bcc','{value}'=>$rs));
+            $log[] = gTxt('mem_self_log_pref_exists', array('{name}' => 'mem_self_admin_bcc','{value}' => $rs));
         }
 
         // create default registration form
@@ -323,13 +323,13 @@ EOF;
 
         if (!$form) {
             if (safe_insert('txp_form',"name='self_register_form',type='misc',Form='{$form_html}'")) {
-                $log[] = gTxt('mem_self_log_form_added', array('{name}'=>'self_register_form'));
+                $log[] = gTxt('mem_self_log_form_added', array('{name}' => 'self_register_form'));
             } else {
-                $log[] = gTxt('mem_self_log_form_failed', array('{name}'=>'self_register_form','{error}'=>mysql_error())).br.
+                $log[] = gTxt('mem_self_log_form_failed', array('{name}' => 'self_register_form','{error}' => mysqli_error($DB->link))).br.
                     '<textpattern style="width:300px;height:150px;">'.htmlspecialchars($form_html).'</textarea>';
             }
         } else {
-            $log[] = gTxt('mem_self_log_form_found', array('{name}'=>'self_register_form'));
+            $log[] = gTxt('mem_self_log_form_found', array('{name}' => 'self_register_form'));
         }
 
         // create default successful registration form to show the user
@@ -342,13 +342,13 @@ EOF;
 
         if (!$form) {
             if (safe_insert('txp_form',"name='self_register_success',type='misc',Form='{$form_html}'")) {
-                $log[] = gTxt('mem_self_log_form_added', array('{name}'=>'self_register_success'));
+                $log[] = gTxt('mem_self_log_form_added', array('{name}' => 'self_register_success'));
             } else {
-                $log[] = gTxt('mem_self_log_form_failed', array('{name}'=>'self_register_success','{error}'=>mysql_error())).br.
+                $log[] = gTxt('mem_self_log_form_failed', array('{name}' => 'self_register_success','{error}' => mysqli_error($DB->link))).br.
                     '<textpattern style="width:300px;height:150px;">'.htmlspecialchars($form_html).'</textarea>';
             }
         } else {
-            $log[] = gTxt('mem_self_log_form_found', array('{name}'=>'self_register_success'));
+            $log[] = gTxt('mem_self_log_form_found', array('{name}' => 'self_register_success'));
         }
 
         // create default successful registration email form
@@ -371,13 +371,13 @@ EOF;
 
         if (!$form) {
             if (safe_insert('txp_form',"name='self_register_email',type='misc',Form='{$form_html}'")) {
-                $log[] = gTxt('mem_self_log_form_added', array('{name}'=>'self_register_email'));
+                $log[] = gTxt('mem_self_log_form_added', array('{name}' => 'self_register_email'));
             } else {
-                $log[] = gTxt('mem_self_log_form_failed', array('{name}'=>'self_register_email','{error}'=>mysql_error())).br.
+                $log[] = gTxt('mem_self_log_form_failed', array('{name}' => 'self_register_email','{error}' => mysqli_error($DB->link))).br.
                     '<textpattern style="width:300px;height:150px;">'.htmlspecialchars($form_html).'</textarea>';
             }
         } else {
-            $log[] = gTxt('mem_self_log_form_found', array('{name}'=>'self_register_email'));
+            $log[] = gTxt('mem_self_log_form_found', array('{name}' => 'self_register_email'));
         }
 
         $tag_help = '<txp:mem_self_register_form form="self_register_form" />';
