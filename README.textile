@@ -7,7 +7,6 @@ This plugin is designed to enable community driven sites. Users will be able to 
 h2(#author-contact). Author Contact
 
 "Michael Manfre":mailto:mmanfre@gmail.com?subject=Textpattern%20mem_self_register%20plugin
-"$":http://manfre.net
 
 h2(#license). License
 
