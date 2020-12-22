@@ -484,13 +484,6 @@ function mem_self_register_form($atts,$thing='')
 {
 	global $prefs, $sitename, $production_status;
 
-	if (!is_callable('mail'))
-	{
-		return ($production_status == 'live') ?
-			mem_self_gTxt('mail_sorry') :
-			gTxt('warn_mail_unavailable');
-	}
-
 	extract(lAtts(array(
 		'form'		=> '',
 		'email_form'	=> '',
@@ -793,14 +786,6 @@ function mem_self_password_reset_form($atts,$thing='')
 		'check_email'	=> 1
 	),$atts,false));
 
-	if (!is_callable('mail'))
-	{
-		return ($production_status == 'live') ?
-			mem_self_gTxt('mail_sorry') :
-			gTxt('warn_mail_unavailable');
-	}
-
-
 	if (gps('mem_self_confirm'))
 	{
 		$user_table = mem_get_user_table_name();
@@ -983,13 +968,6 @@ function mem_self_change_password_form($atts,$thing='')
 
 	header('Cache-Control: no-cache');
 	header('Pragma: no-cache');
-
-	if (!is_callable('mail'))
-	{
-		return ($production_status == 'live') ?
-			mem_self_gTxt('mail_sorry') :
-			gTxt('warn_mail_unavailable');
-	}
 
 	extract(lAtts(array(
 		'form'		=> '',
